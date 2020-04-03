@@ -2,10 +2,29 @@ const express = require("express");
 const app = express();
 
 let broadcaster;
-const port = 4000;
+const port = 5000;
 
-const http = require("http");
-const server = http.createServer(app);
+const path = require("path");
+const fs = require("fs");
+const https = require("https");
+
+var ca = [];
+  var files = [
+    path.join(__dirname, "./certs/shahidachmat.com-le.bundle")
+  ]
+  for (var i = 0; i < files.length; i++) {
+    ca.push(fs.readFileSync(files[i], 'utf8'));
+  }
+
+  var privateKey  = fs.readFileSync(path.join(__dirname, './certs/shahidachmat.com-le.key'), 'utf8');
+  var certificate = fs.readFileSync(path.join(__dirname, './certs/shahidachmat.com-le.crt'), 'utf8');
+  var credentials = {
+    key: privateKey,
+    cert: certificate,
+    ca: ca
+  };
+  
+const server = https.createServer(credentials, app);
 
 const io = require("socket.io")(server);
 app.use(express.static(__dirname + "/public"));
